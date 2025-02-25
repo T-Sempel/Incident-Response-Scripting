@@ -128,7 +128,13 @@ Get-NetTCPConnection -State Established
 Get-NetTCPConnection -State Established | Out-File -FilePath $ReportFolder\Active_Connections.txt
 
 #Start AutoRuns
-.\SysInternals\Autoruns.exe
+.\SysInternals\Autoruns64.exe
 
 #Start ProcessMonitor
-.\SysInternals\ProcMon.exe
+.\SysInternals\ProcMon64.exe
+
+#Start ProcessMonitor
+.\SysInternals\ProcExp64.exe
+
+#Start ProcessMonitor
+.\SysInternals\TCPview64.exe
