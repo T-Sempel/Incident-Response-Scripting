@@ -19,10 +19,16 @@ SUCCESSFUL_ROOT_LOGIN = {}
 def log_failures(ip):                       #Function for tracking the number of failed attempts for the ip
     FAILED_ATTEMPTS.setdefault(ip, 0)       #Set default value for ip to '0'
     FAILED_ATTEMPTS[ip] += 1
+    login_time = datetime.now()
+    formatted_login_time = login_time.strftime("%Y-%m-%d %H:%M:%S %p")      #Formatted time: YYYY-MM-DD HH:MM:SS AM/PM
+    print(f"Failed ssh login at {formatted_login_time} from IP: {ip}")             
 
 def log_failed_root(ip):                    #Function for tracking the number of failed attempts for the ip for failed root logins
     FAILED_ROOT_LOGIN.setdefault(ip, 0)     #Set default value for ip to '0'
-    FAILED_ROOT_LOGIN[ip] += 1                
+    FAILED_ROOT_LOGIN[ip] += 1
+    login_time = datetime.now()
+    formatted_login_time = login_time.strftime("%Y-%m-%d %H:%M:%S %p")      #Formatted time: YYYY-MM-DD HH:MM:SS AM/PM
+    print(f"Failed root login at {formatted_login_time} from IP: {ip}")                
 
 def log_successful_root(ip):
     SUCCESSFUL_ROOT_LOGIN.setdefault(ip, 0)
@@ -32,8 +38,10 @@ def log_successful_root(ip):
     print(f"Successful SSH login from IP: {ip} at {formatted_login_time}")
 
 def block_ip(ip):
+
     try:
         subprocess.run(["sudo", "iptables", "-A", "INPUT", "-s", ip, "-j", "DROP"], check=True)      #use iptables to make rule to block the ip
+        # print(f"IP Address: {ip} would be blocked")   #output for testing script function
         BLOCKED_IP_ADDRESSES[ip] = time.time()          #Initialize start time for blocking ip
         time_blocked = datetime.now()
         formatted_time_blocked = time_blocked.strftime("%Y-%m-%d %H:%M:%S %p")      #Formatted time: YYYY-MM-DD HH:MM:SS AM/PM
@@ -44,6 +52,7 @@ def block_ip(ip):
 def unblock_ip(ip):
     try:
         subprocess.run(["sudo", "iptables", "-D", "INPUT", "-s", ip, "-j", "DROP"], check=True)  #use iptables to make rule to unblock the ip
+        # print(f"IP Address: {ip} would be unblocked") #output for testing script function
         time_unblocked = datetime.now()
         formatted_time_unblocked = time_unblocked.strftime("%Y-%m-%d %H:%M:%S %p")               #Formatted time: YYYY-MM-DD HH:MM:SS AM/PM
         print(f"IP {ip} is now unblocked from the network as of {formatted_time_unblocked}")     #Print out a success message
@@ -65,7 +74,7 @@ def updates():
         while True:
             line = log_file.readline()                      #Initialize line as the defined line *0,2* in LOG_FILE
             if not line:                                    #If there's no logs
-                time.sleep(30)                               #Wait one minute to refresh function
+                time.sleep(1)                               #Wait 1 second to refresh function
                 continue
 
             match = FAILED_LOGIN_PATTERN.search(line)       #Search for formatted line in line 11
@@ -98,9 +107,13 @@ def updates():
 
             if time.time() - last_printed_message >= 300:   #If the timer is over or equal to 5 minutes
                 num_blocked = len(BLOCKED_IP_ADDRESSES)     #Number of IP addresses blocked based off of the length of BLOCKED_IP_ADDRESSES
+                print("\n")
+                print("********")
                 print(f"Number of IP addresses blocked: {num_blocked}")    #Print the number of addresses blocked
                 print(f"Number of total SSH attempts since last update: {TOTAL_SSH_ATTEMPTS}") #Print the number of ssh attempts for the last 5 minutes
                 print(f"Number of failed root login attempts since last update: {FAILED_ROOT_ATTEMPTS}") #Print the number of failed root login attempts for last 5 minutes
+                print("********")
+                print("\n")
                 last_printed_message = time.time()
                 TOTAL_SSH_ATTEMPTS = 0
                 FAILED_ROOT_ATTEMPTS = 0
@@ -108,4 +121,5 @@ def updates():
             time.sleep(1)
 
 if __name__ == "__main__":
+    print("Searching for suspicious login activity...")
     updates()
