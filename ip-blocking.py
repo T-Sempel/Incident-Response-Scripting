@@ -106,3 +106,6 @@ def updates():
                 FAILED_ROOT_ATTEMPTS = 0
 
             time.sleep(1)
+
+if __name__ == "__main__":
+    updates()
