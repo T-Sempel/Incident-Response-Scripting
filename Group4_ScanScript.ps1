@@ -8,16 +8,7 @@
 # https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/plan/appendix-l--events-to-monitor 
 # https://www.xplg.com/windows-server-security-events-list/
 
-
-# o List all active users on a system. - Done
-# o Identify installed software and versions. - Done
-# o Check for missing security patches. - Done
-# o Consider Sysinternals Suite (AutoRuns, TCP View, Process Monitor, etc.)
-# o Consider NirSoft
-# o Identify USB History -Done
-#
-
-#Check for Admin rights
+#Remind to run with Admin rights
 Write-Host "`nPlease be sure to run as Admin. `n  Script continues in 5 seconds. CTRL-C to escape.`n"
 Start-Sleep -Seconds 5
 
@@ -133,8 +124,8 @@ Get-NetTCPConnection -State Established | Out-File -FilePath $ReportFolder\Activ
 #Start ProcessMonitor
 .\SysInternals\ProcMon64.exe
 
-#Start ProcessMonitor
+#Start ProcessExplorer
 .\SysInternals\ProcExp64.exe
 
-#Start ProcessMonitor
+#Start TCPview
 .\SysInternals\TCPview64.exe
